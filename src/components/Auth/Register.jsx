@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import firebase from "../../firebase"
+import md5 from "md5"
 
 import { Grid, Form, Button, Segment, Message, Header, Icon } from 'semantic-ui-react';
 import { Link } from "react-router-dom"
@@ -13,7 +14,8 @@ class Register extends Component {
         password: "",
         passwordConfirm: "",
         errors: [],
-        loading:  false
+        loading:  false,
+        usersRef: firebase.database().ref("users")
     }
 
     isFormValid = () => {
@@ -27,9 +29,9 @@ class Register extends Component {
             this.setState({ 
                 errors: errors.concat(error)
              })
-            
+
             return false
-        } else if(this.isPasswordValid(this.state)) {
+        } else if(!this.isPasswordValid(this.state)) {
             // throw error
             error = {message: "Password is invalid"}
             this.setState({
@@ -47,17 +49,15 @@ class Register extends Component {
         return !email.length || !username.length || !password.length || !passwordConfirm.length
     }
 
-    isPasswordValid = ({password, passwordConfirm }) => {
-        // Check if both parameters are less than 6
-        if(password.length < 6 || passwordConfirm.length < 6){
-            return false
+    isPasswordValid = ({ password, passwordConfirm }) => {
+        if (password.length < 6 || passwordConfirm.length < 6) {
+            return false;
         } else if (password !== passwordConfirm) {
-            return false
-        } 
-        else {
-            return true
+            return false;
+        } else {
+          return true;
         }
-    }
+      };
 
     displayError = errors => errors.map((error, i) => {
         return (
@@ -80,7 +80,7 @@ class Register extends Component {
                 errors: [],
                 loading: true
             })
-            const {email, password} = this.state
+            const {email, password, username} = this.state
             
             // firebase
             firebase
@@ -88,9 +88,24 @@ class Register extends Component {
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
                     console.log(createdUser)
-                    this.setState({
-                        loading: false
+
+                    createdUser.user.updateProfile({
+                        displayName: username,
+                        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon` 
                     })
+                    .then(() => {
+                        this.saveUser(createdUser).then(() => {
+                            console.log("user saved")
+                        })
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        this.setState({
+                            loading: false,
+                            errors: this.state.errors.concat(err)
+                        })
+                    })
+                    
                 })
                 .catch(err => {
                     console.log(err)
@@ -102,10 +117,19 @@ class Register extends Component {
         }
     }
 
-    handleInputErrors = (errors, inputName) => {
-        return errors.some(error => 
-            error.message.toLowerCase().includes(inputName)) ? "error" : ""
+    saveUser = createdUser => {
+        return this.state.usersRef.child(createdUser.user.uid).set({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL
+        })
     }
+
+    handleInputErrors = (errors, inputName) => {
+        return errors.some(error => error.message.toLowerCase().includes(inputName))
+          ? "error"
+          : "";
+      };
+    
 
     render() {
 
