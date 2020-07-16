@@ -18,6 +18,7 @@ class Register extends Component {
         usersRef: firebase.database().ref("users")
     }
 
+    // isFormValid function
     isFormValid = () => {
         // errors array // also add initial value to state
         let errors = []
@@ -73,7 +74,7 @@ class Register extends Component {
         }
       };
 
-    // Display errors
+    // Display errors function
     // take the errors array in the state
     // map over the errors to get individual errors
     displayError = errors => errors.map((error, i) => {
@@ -102,7 +103,7 @@ class Register extends Component {
                 errors: [],
                 loading: true
             })
-            const {email, password, username} = this.state
+            const {email, password, username, errors} = this.state
             
             // firebase
             firebase
@@ -127,7 +128,7 @@ class Register extends Component {
                         console.log(err)
                         this.setState({
                             loading: false,
-                            errors: this.state.errors.concat(err)
+                            errors: errors.concat(err)
                         })
                     })
                     
@@ -136,7 +137,7 @@ class Register extends Component {
                     console.log(err)
                     this.setState({
                         loading: false,
-                        errors: this.state.errors.concat(err)
+                        errors: errors.concat(err)
                     })
                 })
         }
@@ -166,9 +167,9 @@ class Register extends Component {
         return (
             <Grid className="app" textAlign="center" verticalAlign="middle">
                 <Grid.Column style={{ maxWidth: 450 }}>
-                    <Header as="h2" icon color="black" textAlign="center">
+                    <Header as="h1" icon color="black" textAlign="center">
                         <Icon name="code" color="violet"/>
-                        Register for DevChat
+                        DevChat - Register
                     </Header>
                     <Form onSubmit={this.handleSubmit} size="large">
                         <Segment stacked>
