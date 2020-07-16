@@ -12,18 +12,18 @@ class Register extends Component {
         email: "",
         password: "",
         passwordConfirm: "",
-        errors: []
+        errors: [],
+        loading:  false
     }
 
     isFormValid = () => {
-
         let errors = []
         let error
 
         // check if form is empty or not
         if(this.isFormEmpty(this.state)){
             // throw error
-            error = { message: "Fill in all fields" }
+            error = { message: "Please fill in all fields" }
             this.setState({ 
                 errors: errors.concat(error)
              })
@@ -53,7 +53,8 @@ class Register extends Component {
             return false
         } else if (password !== passwordConfirm) {
             return false
-        } else {
+        } 
+        else {
             return true
         }
     }
@@ -71,10 +72,15 @@ class Register extends Component {
     }
 
     handleSubmit = (e) => {
+        e.preventDefault()
+
         // check if form is valid
         if (this.isFormValid()) {
+            this.setState({
+                errors: [],
+                loading: true
+            })
             const {email, password} = this.state
-            e.preventDefault()
             
             // firebase
             firebase
@@ -82,16 +88,28 @@ class Register extends Component {
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
                     console.log(createdUser)
+                    this.setState({
+                        loading: false
+                    })
                 })
                 .catch(err => {
                     console.log(err)
+                    this.setState({
+                        loading: false,
+                        errors: this.state.errors.concat(err)
+                    })
                 })
         }
     }
 
+    handleInputErrors = (errors, inputName) => {
+        return errors.some(error => 
+            error.message.toLowerCase().includes(inputName)) ? "error" : ""
+    }
+
     render() {
 
-        const { username, email, password, passwordConfirm, errors } = this.state
+        const { username, email, password, passwordConfirm, errors, loading } = this.state
 
         return (
             <Grid className="app" textAlign="center" verticalAlign="middle">
@@ -102,11 +120,11 @@ class Register extends Component {
                     </Header>
                     <Form onSubmit={this.handleSubmit} size="large">
                         <Segment stacked>
-                            <Form.Input type="text" name="username" icon="user" value={username} iconPosition="left" placeholder="Enter Username" onChange={this.handleChange} />
-                            <Form.Input type="text" name="email" icon="mail" value={email} iconPosition="left" placeholder="Enter Email" onChange={this.handleChange}/>
-                            <Form.Input type="password" name="password" icon="lock" value={password} iconPosition="left" placeholder="Enter Password" onChange={this.handleChange}/>
-                            <Form.Input type="password" name="passwordConfirm" icon="repeat" value={passwordConfirm} iconPosition="left" placeholder="Confirm Password" onChange={this.handleChange}/>
-                            <Button color="violet" fluid size="large">Submit</Button>
+                            <Form.Input className={this.handleInputErrors(errors, "username")} fluid type="text" name="username" icon="user" value={username} iconPosition="left" placeholder="Enter Username" onChange={this.handleChange} />
+                            <Form.Input className={this.handleInputErrors(errors, "email")} fluid type="text" name="email" icon="mail" value={email} iconPosition="left" placeholder="Enter Email" onChange={this.handleChange}/>
+                            <Form.Input className={this.handleInputErrors(errors, "password")} fluid type="password" name="password" icon="lock" value={password} iconPosition="left" placeholder="Enter Password" onChange={this.handleChange}/>
+                            <Form.Input className={this.handleInputErrors(errors, "passwordConfirm")} fluid type="password" name="passwordConfirm" icon="repeat" value={passwordConfirm} iconPosition="left" placeholder="Confirm Password" onChange={this.handleChange}/>
+                            <Button disabled={loading} className={loading ? "loading" : ""} color="violet" fluid size="large">Submit</Button>
                         </Segment>
                     </Form>
 
