@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import firebase from "../../firebase"
+import { connect } from "react-redux"
+import { setCurrentChannel } from "../../actions"
 import { Menu, Icon, Modal, Form, Input, Button } from "semantic-ui-react"
 
 class Channels extends Component {
@@ -29,19 +31,6 @@ class Channels extends Component {
         })
     }
 
-    // Display channels
-    displayChannels = channels => (
-        channels.length > 0 && channels.map(channel => (
-            <Menu.Item
-                key={channel.id}
-                name={channel.name}
-                onClick={() => console.log(channel)}
-                style={{ opacity: 0.7 }}
-            >
-               # {channel.name} 
-            </Menu.Item>
-        ))
-    )
 
     // Handle submit method
     handleSubmit = e => {
@@ -50,6 +39,25 @@ class Channels extends Component {
             this.addChannel()
         } 
     }
+
+    // ChangeChannel method
+    changeChannel = channel => {
+        this.props.setCurrentChannel(channel)
+    }
+
+    // Display channels
+    displayChannels = channels => (
+        channels.length > 0 && channels.map(channel => (
+            <Menu.Item
+                key={channel.id}
+                name={channel.name}
+                onClick={() => this.changeChannel(channel)}
+                style={{ opacity: 0.7 }}
+            >
+               # {channel.name} 
+            </Menu.Item>
+        ))
+    )
 
     // Check if the form has valid inputs
     isFormValid = ({ channel_name, channel_details }) => channel_name && channel_details
@@ -177,4 +185,6 @@ class Channels extends Component {
     }
 }
 
-export default Channels;
+export default connect(
+    null, 
+    { setCurrentChannel })(Channels);
