@@ -13,6 +13,36 @@ class Channels extends Component {
         modal: false
     }
 
+    componentDidMount() {
+        // Load all channels
+        this.addListeners()
+    }
+    
+    // Get all the channels added
+    addListeners = () => {
+        let loadedChannels = []
+        this.state.channelsRef.on("child_added", snap => {
+            loadedChannels.push(snap.val())
+            this.setState({
+                channels: loadedChannels
+            })
+        })
+    }
+
+    // Display channels
+    displayChannels = channels => (
+        channels.length > 0 && channels.map(channel => (
+            <Menu.Item
+                key={channel.id}
+                name={channel.name}
+                onClick={() => console.log(channel)}
+                style={{ opacity: 0.7 }}
+            >
+               # {channel.name} 
+            </Menu.Item>
+        ))
+    )
+
     // Handle submit method
     handleSubmit = e => {
         e.preventDefault()
@@ -94,7 +124,12 @@ class Channels extends Component {
                             CHANNELS
                         </span> ({ channels.length }) <Icon name="add" onClick={this.openModal}/>
                     </Menu.Item>
+
                     {/* Show all channels in state */}
+                    {
+                        this.displayChannels(channels)
+                    }
+
                 </Menu.Menu>
 
                 {/* Add Channel Modal */}
