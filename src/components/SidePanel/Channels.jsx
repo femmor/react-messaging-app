@@ -21,6 +21,11 @@ class Channels extends Component {
         // Load all channels
         this.addListeners()
     }
+
+    componentWillUnmount() {
+        // remove listeners with componentWillUnmount
+        this.removeListeners();
+      }
     
     // Get all the channels added
     addListeners = () => {
@@ -33,6 +38,11 @@ class Channels extends Component {
             () => this.setFirstChannel())
         })
     }
+    
+    // remove listeners
+    removeListeners = () => {
+        this.state.channelsRef.off();
+    };
 
     // Set first channel, show channel on load
     setFirstChannel = () => {
