@@ -56,7 +56,7 @@ class Channels extends Component {
                         Add a Channel
                     </Modal.Header>
                     <Modal.Content>
-                        <Form>
+                        <Form onSubit={this.handleSubmit}>
                             <Form.Field>
                                 <Input 
                                     fluid
