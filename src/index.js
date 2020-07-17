@@ -43,7 +43,10 @@ class Root extends Component {
     }
 }
 
-const RootWithAuth = withRouter(connect(null, {setUser})(Root))
+// connect allows us to connect the redux state and actions with a given react component
+const RootWithAuth = withRouter(connect(null, {setUser})(Root)) // mapDispatchToProps = {setUser}
+
+// mapDispatchToProps takes the setUser action and put it on the props object
 
 ReactDOM.render( 
     <Provider store = { store } >

@@ -6,7 +6,9 @@ const initialUserState = {
     isLoading: true
 }
 
+// reduces all the user related data
 const user_reducer = (state = initialUserState, action) => {
+    // Updates state depending on the type of action coming in
     switch(action.type) {
         case actionTypes.SET_USER: 
             return {
