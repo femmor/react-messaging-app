@@ -14,7 +14,7 @@ import { createStore } from "redux"
 import { Provider, connect } from "react-redux"
 import { composeWithDevTools } from "redux-devtools-extension"
 import rootReducer from './reducers';
-import { setUser } from "./actions"
+import { setUser, clearUser } from "./actions"
 
 const store = createStore(rootReducer, composeWithDevTools())
 
@@ -27,8 +27,15 @@ class Root extends Component {
             .onAuthStateChanged(user => {
                 // Check if there's a user then 
                 if (user) {
+                    // If user exists, setUser to the user
                     this.props.setUser(user)
+                    // redirect to the Chat page
                     this.props.history.push("/")
+                } else {
+                    // If no user or user logged out
+                    // redirect to the Login page and clearUser from the Global state
+                    this.props.history.push("/login")
+                    this.props.clearUser();
                 }
             })
     }
@@ -52,7 +59,7 @@ const mapStateToProps = state => ({
 // connect allows us to connect the redux state and actions with a given react component
 const RootWithAuth = withRouter(connect(
     mapStateToProps, 
-    {setUser})(Root)) // mapDispatchToProps = {setUser}
+    { setUser, clearUser })(Root)) // mapDispatchToProps = {setUser...}
 
 // mapDispatchToProps takes the setUser action and put it on the props object
 
