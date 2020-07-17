@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import firebase from "./firebase"
 import App from './components/App';
 
+import Spinner from "./components/Spinner"
+
 // Components
 import Login from "./components/Auth/Login"
 import Register from "./components/Auth/Register"
@@ -33,7 +35,7 @@ class Root extends Component {
 
 
     render() {
-        return ( 
+        return this.props.isLoading ? <Spinner /> : ( 
             <Switch>
                 <Route path="/"exact component={App}/>
                 <Route path="/login" component={Login}/> 
@@ -43,8 +45,14 @@ class Root extends Component {
     }
 }
 
+const mapStateToProps = state => ({
+    isLoading: state.user.isLoading
+})
+
 // connect allows us to connect the redux state and actions with a given react component
-const RootWithAuth = withRouter(connect(null, {setUser})(Root)) // mapDispatchToProps = {setUser}
+const RootWithAuth = withRouter(connect(
+    mapStateToProps, 
+    {setUser})(Root)) // mapDispatchToProps = {setUser}
 
 // mapDispatchToProps takes the setUser action and put it on the props object
 
